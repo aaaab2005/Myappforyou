@@ -104,16 +104,27 @@ let today = new Date();
 let index = today.getDate() % messages.length;
 document.getElementById("dailyMessage").innerHTML = messages[index];
 
-let start = new Date(2023, 6, 28); 
-let diff = today - start;
+function calculateExactDifference(startDate, endDate) {
+    let years = endDate.getFullYear() - startDate.getFullYear();
+    let months = endDate.getMonth() - startDate.getMonth();
+    let days = endDate.getDate() - startDate.getDate();
 
-let days = Math.floor(diff / (1000 * 60 * 60 * 24));
-let years = Math.floor(days / 365);
-let months = Math.floor((days % 365) / 30);
-let restDays = (days % 365) % 30;
+    if (days < 0) {
+        months--;
+        let previousMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 0).getDate();
+        days += previousMonth;
+    }
 
-document.getElementById("counter").innerHTML =
-    years + " سنة • " + months + " شهر • " + restDays + " يوم";
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    return { years, months, days };
+}
+
+// التاريخ الأصلي
+let startDate = new
 
 function loadNotes() {
     let notes = localStorage.getItem("notes");
