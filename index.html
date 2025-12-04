@@ -104,7 +104,7 @@ let today = new Date();
 let index = today.getDate() % messages.length;
 document.getElementById("dailyMessage").innerHTML = messages[index];
 
-let start = new Date(2023, 5, 28); 
+let start = new Date(2023, 6, 28); 
 let diff = today - start;
 
 let days = Math.floor(diff / (1000 * 60 * 60 * 24));
