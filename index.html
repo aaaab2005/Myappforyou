@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>For My Boo</title>
+
 <style>
     body {
         background: #ffd6e8;
@@ -10,7 +11,7 @@
         text-align: center;
         padding: 20px;
         color: #b3005c;
-        font-size: 26px; /* تكبير شامل */
+        font-size: 26px;
     }
     h1 {
         font-size: 40px;
@@ -26,7 +27,7 @@
         padding: 20px;
         border-radius: 12px;
         margin-top: 25px;
-        font-size: 26px; /* تكبير الرسالة */
+        font-size: 26px;
         line-height: 1.8;
     }
     .notes-box {
@@ -44,7 +45,7 @@
         border: none;
         padding: 14px;
         margin-top: 10px;
-        font-size: 22px; /* تكبير الكتابة */
+        font-size: 22px;
     }
     button {
         width: 100%;
@@ -53,16 +54,17 @@
         border-radius: 10px;
         background: #ff5fa2;
         color: white;
-        font-size: 26px;  /* تكبير زر */
+        font-size: 26px;
         margin-top: 12px;
         font-weight: bold;
     }
     #notesList div {
-        font-size: 24px; /* ملاحظات كبيرة */
+        font-size: 24px;
         padding: 8px 0;
     }
 </style>
 </head>
+
 <body>
 
 <h1>For My Boo 💗</h1>
@@ -80,6 +82,7 @@
 </div>
 
 <script>
+/* ------------------------- رسائل اليوم ------------------------- */
 const messages = [
     "علابالك شوا كندير درك ؟ نخمم فيك💭💗",
     "لوكان جيت قطة تڤولي pspsps 🙄😔",
@@ -100,10 +103,14 @@ const messages = [
     "كي تغمض عينيك وتشوف 2046، تلقاني معاك؟"
 ];
 
+// رسالة اليوم
 let today = new Date();
 let index = today.getDate() % messages.length;
 document.getElementById("dailyMessage").innerHTML = messages[index];
 
+/* ------------------------- حساب العداد ------------------------- */
+
+// دالة الفرق الحقيقي: سنوات - أشهر - أيام
 function calculateExactDifference(startDate, endDate) {
     let years = endDate.getFullYear() - startDate.getFullYear();
     let months = endDate.getMonth() - startDate.getMonth();
@@ -123,9 +130,23 @@ function calculateExactDifference(startDate, endDate) {
     return { years, months, days };
 }
 
-// التاريخ الأصلي
-let startDate = new
+/* 🔥 غيري التاريخ هنا كما تحبين — مثال: 6 أشهر و6 أيام */
+// تذكير: الشهر يبدأ من 0 = جانفي
+let startDate = new Date(2025, 4, 28); // 28 ماي 2025
 
+// تحديث العداد
+function updateCounter() {
+    let now = new Date();
+    let diff = calculateExactDifference(startDate, now);
+
+    document.getElementById("counter").innerHTML =
+        `مرت ${diff.years} سنة، ${diff.months} أشهر، و ${diff.days} أيام مع بعض 💗`;
+}
+
+updateCounter();
+setInterval(updateCounter, 1000 * 60 * 60); // تحديث كل ساعة
+
+/* ------------------------- الملاحظات ------------------------- */
 function loadNotes() {
     let notes = localStorage.getItem("notes");
     if (!notes) return;
