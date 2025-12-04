@@ -63,8 +63,8 @@
         padding: 8px 0;
     }
 </style>
-</head>
 
+</head>
 <body>
 
 <h1>For My Boo 💗</h1>
@@ -72,6 +72,11 @@
 <div class="counter" id="counter"></div>
 
 <div class="message" id="dailyMessage"></div>
+
+<!-- زر التسجيل -->
+<button id="recordBtn">🎤 تسجيل صوتي</button>
+<button id="playBtn">▶️ تشغيل التسجيل</button>
+<a id="downloadLink" style="display:none;">تحميل التسجيل</a>
 
 <div class="notes-box">
     <h3 style="font-size:28px;">ملاحظاتك 📝</h3>
@@ -82,7 +87,7 @@
 </div>
 
 <script>
-/* ------------------------- رسائل اليوم ------------------------- */
+/* رسائل يومية */
 const messages = [
     "علابالك شوا كندير درك ؟ نخمم فيك💭💗",
     "لوكان جيت قطة تڤولي pspsps 🙄😔",
@@ -103,14 +108,11 @@ const messages = [
     "كي تغمض عينيك وتشوف 2046، تلقاني معاك؟"
 ];
 
-// رسالة اليوم
 let today = new Date();
 let index = today.getDate() % messages.length;
 document.getElementById("dailyMessage").innerHTML = messages[index];
 
-/* ------------------------- حساب العداد ------------------------- */
-
-// دالة الفرق الحقيقي: سنوات - أشهر - أيام
+/* حساب الفرق بدقة */
 function calculateExactDifference(startDate, endDate) {
     let years = endDate.getFullYear() - startDate.getFullYear();
     let months = endDate.getMonth() - startDate.getMonth();
@@ -118,8 +120,8 @@ function calculateExactDifference(startDate, endDate) {
 
     if (days < 0) {
         months--;
-        let previousMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 0).getDate();
-        days += previousMonth;
+        let prevDays = new Date(endDate.getFullYear(), endDate.getMonth(), 0).getDate();
+        days += prevDays;
     }
 
     if (months < 0) {
@@ -130,32 +132,34 @@ function calculateExactDifference(startDate, endDate) {
     return { years, months, days };
 }
 
-/* 🔥 غيري التاريخ هنا كما تحبين — مثال: 6 أشهر و6 أيام */
-// تذكير: الشهر يبدأ من 0 = جانفي
-let startDate = new Date(2025, 4, 28); // 28 ماي 2025
+/* البداية = اليوم - 2 سنة - 6 أشهر - 6 أيام */
+let startDate = new Date();
+startDate.setFullYear(startDate.getFullYear() - 2);
+startDate.setMonth(startDate.getMonth() - 6);
+startDate.setDate(startDate.getDate() - 6);
 
-// تحديث العداد
 function updateCounter() {
     let now = new Date();
     let diff = calculateExactDifference(startDate, now);
 
     document.getElementById("counter").innerHTML =
-        `مرت ${diff.years} سنة، ${diff.months} أشهر، و ${diff.days} أيام مع بعض 💗`;
+        `${diff.years} سنة • ${diff.months} أشهر • ${diff.days} أيام`;
 }
 
 updateCounter();
-setInterval(updateCounter, 1000 * 60 * 60); // تحديث كل ساعة
 
-/* ------------------------- الملاحظات ------------------------- */
+/* تحديث كل يوم */
+setInterval(updateCounter, 1000 * 60 * 60 * 24);
+
+/* الملاحظات */
 function loadNotes() {
     let notes = localStorage.getItem("notes");
     if (!notes) return;
 
     notes = JSON.parse(notes);
-
     let list = document.getElementById("notesList");
     list.innerHTML = "";
-    
+
     notes.forEach(n => {
         let div = document.createElement("div");
         div.innerText = "• " + n;
@@ -178,6 +182,57 @@ function addNote() {
 }
 
 loadNotes();
+
+/* زر التسجيل */
+let mediaRecorder;
+let audioChunks = [];
+let audioBlob;
+
+document.getElementById("recordBtn").onclick = async () => {
+    if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+        mediaRecorder.onstop = () => {
+            audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+            let audioURL = URL.createObjectURL(audioBlob);
+
+            // حفظ التسجيل
+            let reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            reader.onloadend = () => {
+                localStorage.setItem("savedAudio", reader.result);
+            };
+
+            let link = document.getElementById("downloadLink");
+            link.href = audioURL;
+            link.download = "my_recording.webm";
+            link.style.display = "block";
+            link.textContent = "تحميل التسجيل";
+        };
+
+        mediaRecorder.start();
+        document.getElementById("recordBtn").textContent = "⏹️ إيقاف التسجيل";
+    }
+    else if (mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        document.getElementById("recordBtn").textContent = "🎤 تسجيل صوتي";
+    }
+};
+
+/* تشغيل التسجيل */
+document.getElementById("playBtn").onclick = () => {
+    let saved = localStorage.getItem("savedAudio");
+    if (!saved) {
+        alert("لا يوجد تسجيل محفوظ!");
+        return;
+    }
+    let audio = new Audio(saved);
+    audio.play();
+};
 </script>
 
 </body>
