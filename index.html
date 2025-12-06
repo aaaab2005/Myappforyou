@@ -6,234 +6,154 @@
 
 <style>
     body {
-        background: #ffd6e8;
-        font-family: "Tahoma";
+        font-family: "Cairo", sans-serif;
         text-align: center;
+        background: #ffe6f1;
         padding: 20px;
-        color: #b3005c;
-        font-size: 26px;
     }
-    h1 {
-        font-size: 40px;
-        font-weight: bold;
-    }
-    .counter {
-        font-size: 34px;
-        margin-top: 20px;
-        font-weight: bold;
-    }
-    .message {
-        background: #ffffffaa;
-        padding: 20px;
-        border-radius: 12px;
-        margin-top: 25px;
-        font-size: 26px;
-        line-height: 1.8;
-    }
-    .notes-box {
-        margin-top: 25px;
+    .box {
         background: white;
         padding: 20px;
-        border-radius: 12px;
-        text-align: right;
-        font-size: 24px;
-    }
-    textarea {
-        width: 100%;
-        height: 110px;
-        border-radius: 10px;
-        border: none;
-        padding: 14px;
-        margin-top: 10px;
-        font-size: 22px;
+        border-radius: 15px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0 0 10px #ffb6d5;
     }
     button {
-        width: 100%;
-        padding: 16px;
-        border: none;
+        padding: 10px 20px;
         border-radius: 10px;
-        background: #ff5fa2;
-        color: white;
-        font-size: 26px;
-        margin-top: 12px;
-        font-weight: bold;
+        border: none;
+        margin: 5px;
+        cursor: pointer;
+        font-size: 18px;
     }
-    #notesList div {
-        font-size: 24px;
-        padding: 8px 0;
+    .emoji-btn {
+        font-size: 35px;
+        background: none;
     }
 </style>
-
 </head>
+
 <body>
 
-<h1>For My Boo 💗</h1>
+<div class="box" id="moodBox">
+    <h3>كيف حالك اليوم؟</h3>
+    <button class="emoji-btn" onclick="saveMood('😭')">😭</button>
+    <button class="emoji-btn" onclick="saveMood('❤️')">❤️</button>
+    <button class="emoji-btn" onclick="saveMood('🤐')">🤐</button>
+    <p id="savedMood" style="margin-top:15px;font-size:20px;"></p>
+</div>
 
-<div class="counter" id="counter"></div>
+<br>
 
-<div class="message" id="dailyMessage"></div>
+<div class="box" id="messageBox" style="display:none;">
+    <h3>رسالة اليوم 💌</h3>
+    <p id="dailyMessage"></p>
+</div>
 
-<!-- زر التسجيل -->
-<button id="recordBtn">🎤 تسجيل صوتي</button>
-<button id="playBtn">▶️ تشغيل التسجيل</button>
-<a id="downloadLink" style="display:none;">تحميل التسجيل</a>
+<br>
 
-<div class="notes-box">
-    <h3 style="font-size:28px;">ملاحظاتك 📝</h3>
-    <div id="notesList"></div>
-
-    <textarea id="noteInput" placeholder="أكتبي ملاحظة هنا…"></textarea>
-    <button onclick="addNote()">إضافة ملاحظة</button>
+<div class="box">
+    <h3>لعبة حجرة - ورقة - مقص 🎮</h3>
+    <button onclick="play('rock')">🪨 حجرة</button>
+    <button onclick="play('paper')">📄 ورقة</button>
+    <button onclick="play('scissors')">✂️ مقص</button>
+    <p id="gameResult" style="margin-top:15px;font-size:18px;"></p>
 </div>
 
 <script>
-/* رسائل يومية */
+
+// -----------------------
+// رسائل الحب ❤️
+// -----------------------
+
 const messages = [
     "علابالك شوا كندير درك ؟ نخمم فيك💭💗",
     "لوكان جيت قطة تڤولي pspsps 🙄😔",
     "نتا أجمل حاجة صراتلي 🫶🏻❤️",
-    "عجبتك l'app هادي؟ درتها باش نفرحك 🩷",
+    "عجبتك l\"app هادي؟ درتها باش نفرحك 🩷",
     "نحبك مام منڤولهاش كل نهار 😭💗",
     "Bcc coucou saha 3idkom 😂😂 معلاباليش لماه كتبتها",
-    "نهار لي عرفتك فيه منسيتوش يبان كان لبارح 😩",
+    "نهار دي عرفتك فيه منسيتوش يبان كان لبارح 😩",
     "شوا ڤاعد دير؟ توحشتيني 🙄",
     "لوكان نتخاصمو تسوبريمي for my boo ولا تخليها 🤧",
     "اول مرة ندير app فحياتي ودرتها على جالك 😔💗",
-    "Ily !🩷 اختصار I love you 😬🖖🏻",
-    "تعجبك كلمة best friend؟ نتا best friend تاعي 🐣",
+    "Ily !🩷 موالفة نبعتهالك ومفهمتيهاش اختصار تاع i love you 😬🖖🏻",
+    "تعجبك كلمة best friend ؟علابالي متعجبكش نتا best friend تاعي 🐣",
     "كوتي كوتي يا خلاصو 👶🏻",
     "ملڤيتش شوا نڤولك ليوم 😬",
-    "لوكان جيت فراشة تصيدني؟ 😑",
+    "لوكان جيت فراشة تصيدني؟ 😑 اذا ڤولتي تصيدني يعني متحبليش لخير وحاب نموت واذا ڤولتي متصيدنيش يعني نتا مسامعش بيا",
     "ڤداه عمرنا ليوم ؟ جاوب فلنسطا 🙄",
-    "كي تغمض عينيك وتشوف 2046، تلقاني معاك؟"
+    "كي تغمض عينيك وتيماجيني روحك ف 2046 تشوفني معاك؟"
 ];
 
-let today = new Date();
-let index = today.getDate() % messages.length;
-document.getElementById("dailyMessage").innerHTML = messages[index];
+// -----------------------
+// تخزين المزاج لمدة 24 ساعة
+// -----------------------
 
-/* حساب الفرق بدقة */
-function calculateExactDifference(startDate, endDate) {
-    let years = endDate.getFullYear() - startDate.getFullYear();
-    let months = endDate.getMonth() - startDate.getMonth();
-    let days = endDate.getDate() - startDate.getDate();
+function saveMood(emoji) {
+    const expire = Date.now() + 24 * 60 * 60 * 1000;
+    localStorage.setItem("mood", JSON.stringify({ emoji, expire }));
+    document.getElementById("savedMood").innerText = "مزاجك اليوم: " + emoji;
 
-    if (days < 0) {
-        months--;
-        let prevDays = new Date(endDate.getFullYear(), endDate.getMonth(), 0).getDate();
-        days += prevDays;
-    }
-
-    if (months < 0) {
-        years--;
-        months += 12;
-    }
-
-    return { years, months, days };
+    showMessage();
 }
 
-/* البداية = اليوم - 2 سنة - 6 أشهر - 6 أيام */
-let startDate = new Date();
-startDate.setFullYear(startDate.getFullYear() - 2);
-startDate.setMonth(startDate.getMonth() - 6);
-startDate.setDate(startDate.getDate() - 6);
+function loadMood() {
+    const saved = localStorage.getItem("mood");
+    if (!saved) return;
 
-function updateCounter() {
-    let now = new Date();
-    let diff = calculateExactDifference(startDate, now);
-
-    document.getElementById("counter").innerHTML =
-        `${diff.years} سنة • ${diff.months} أشهر • ${diff.days} أيام`;
-}
-
-updateCounter();
-
-/* تحديث كل يوم */
-setInterval(updateCounter, 1000 * 60 * 60 * 24);
-
-/* الملاحظات */
-function loadNotes() {
-    let notes = localStorage.getItem("notes");
-    if (!notes) return;
-
-    notes = JSON.parse(notes);
-    let list = document.getElementById("notesList");
-    list.innerHTML = "";
-
-    notes.forEach(n => {
-        let div = document.createElement("div");
-        div.innerText = "• " + n;
-        list.appendChild(div);
-    });
-}
-
-function addNote() {
-    let text = document.getElementById("noteInput").value.trim();
-    if (!text) return;
-
-    let notes = localStorage.getItem("notes");
-    notes = notes ? JSON.parse(notes) : [];
-
-    notes.push(text);
-    localStorage.setItem("notes", JSON.stringify(notes));
-
-    document.getElementById("noteInput").value = "";
-    loadNotes();
-}
-
-loadNotes();
-
-/* زر التسجيل */
-let mediaRecorder;
-let audioChunks = [];
-let audioBlob;
-
-document.getElementById("recordBtn").onclick = async () => {
-    if (!mediaRecorder || mediaRecorder.state === "inactive") {
-        let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-
-        audioChunks = [];
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-
-        mediaRecorder.onstop = () => {
-            audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-            let audioURL = URL.createObjectURL(audioBlob);
-
-            // حفظ التسجيل
-            let reader = new FileReader();
-            reader.readAsDataURL(audioBlob);
-            reader.onloadend = () => {
-                localStorage.setItem("savedAudio", reader.result);
-            };
-
-            let link = document.getElementById("downloadLink");
-            link.href = audioURL;
-            link.download = "my_recording.webm";
-            link.style.display = "block";
-            link.textContent = "تحميل التسجيل";
-        };
-
-        mediaRecorder.start();
-        document.getElementById("recordBtn").textContent = "⏹️ إيقاف التسجيل";
-    }
-    else if (mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
-        document.getElementById("recordBtn").textContent = "🎤 تسجيل صوتي";
-    }
-};
-
-/* تشغيل التسجيل */
-document.getElementById("playBtn").onclick = () => {
-    let saved = localStorage.getItem("savedAudio");
-    if (!saved) {
-        alert("لا يوجد تسجيل محفوظ!");
+    const data = JSON.parse(saved);
+    if (Date.now() > data.expire) {
+        localStorage.removeItem("mood");
         return;
     }
-    let audio = new Audio(saved);
-    audio.play();
-};
-</script>
 
+    document.getElementById("savedMood").innerText = "مزاجك اليوم: " + data.emoji;
+    showMessage();
+}
+
+loadMood();
+
+// -----------------------
+// رسالة حب يومية ❤️
+// -----------------------
+
+function showMessage() {
+    document.getElementById("messageBox").style.display = "block";
+    const random = messages[Math.floor(Math.random() * messages.length)];
+    document.getElementById("dailyMessage").innerText = random;
+}
+
+// -----------------------
+// لعبة حجرة ورقة مقص 🎮
+// -----------------------
+
+function play(user) {
+    const choices = ["rock", "paper", "scissors"];
+    const bot = choices[Math.floor(Math.random() * 3)];
+
+    let result = "";
+
+    if (user === bot) result = "تعادل 😐";
+    else if (
+        (user === "rock" && bot === "scissors") ||
+        (user === "paper" && bot === "rock") ||
+        (user === "scissors" && bot === "paper")
+    ) {
+        result = "ربحتييي! 🎉😍";
+    } else {
+        result = "خسرتي 🙄😂";
+    }
+
+    document.getElementById("gameResult").innerHTML =
+        `إنتي اخترتي: ${translate(user)}<br>البرنامج اختار: ${translate(bot)}<br><br><b>${result}</b>`;
+}
+
+function translate(choice) {
+    return choice === "rock" ? "🪨" : choice === "paper" ? "📄" : "✂️";
+}
+
+</script>
 </body>
 </html>
