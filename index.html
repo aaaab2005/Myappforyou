@@ -4,312 +4,137 @@
 <meta charset="UTF-8" />
 <title>For My Boo</title>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
 <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #f5f5f5;
+        overflow: hidden;
+    }
 
-/* 🔥 تكبير آمن ما يمنعش الضغط */
-body {
-    transform: scale(1.15);
-    transform-origin: top center;
-}
+    /* القائمة الجانبية */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 70px;
+        height: 100vh;
+        background: #ff7aa2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 20px;
+        gap: 20px;
+        box-shadow: 3px 0 8px rgba(0,0,0,0.2);
+    }
 
-body {
-    background: #ffd6e8;
-    font-family: "Tahoma";
-    text-align: center;
-    padding: 20px;
-    color: #b3005c;
-}
+    .side-btn {
+        width: 55px;
+        height: 55px;
+        background: white;
+        border-radius: 15px;
+        font-size: 22px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+    }
 
-h1 { font-size: 36px; }
+    /* المحتوى */
+    .container {
+        margin-left: 80px;
+        padding: 20px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
 
-.section {
-    background: #ffffffaa;
-    padding: 15px;
-    margin-top: 20px;
-    border-radius: 15px;
-    box-shadow: 0 0 8px #ff9ec9;
-}
+    h2 {
+        margin-top: 0;
+        color: #ff2f77;
+    }
 
-.counter {
-    font-size: 30px;
-    font-weight: bold;
-    margin-top: 10px;
-}
+    /* الرسائل */
+    .chat-box {
+        flex: 1;
+        background: white;
+        border-radius: 15px;
+        padding: 15px;
+        overflow-y: auto;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
 
-input, button {
-    width: 90%;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    margin-top: 10px;
-    font-size: 18px;
-}
-
-button {
-    background: #ff5fa2;
-    color: white;
-    cursor: pointer;
-}
-
-.emoji-choice span {
-    font-size: 40px;
-    margin: 10px;
-    cursor: pointer;
-}
-
-.bubble {
-    margin: 8px 0;
-    padding: 10px;
-    border-radius: 12px;
-    background: #ffe0ef;
-    text-align: right;
-    width: fit-content;
-    max-width: 80%;
-}
-
+    .message {
+        background: #ffe3ee;
+        padding: 10px 15px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        width: fit-content;
+        max-width: 80%;
+    }
 </style>
 </head>
 
 <body>
 
-<h1>For My Boo 💗</h1>
-
-<!-- عداد الحب -->
-<div class="section">
-    <h2>عداد الحب ❤️</h2>
-    <div class="counter" id="counter">...</div>
-
-    <input id="yearsInput" type="number" placeholder="عدد السنوات">
-    <input id="monthsInput" type="number" placeholder="عدد الأشهر">
-    <input id="daysInput" type="number" placeholder="عدد الأيام">
-    <button onclick="setCustomStartDate()">تغيير العداد يدويًا</button>
+<!-- القائمة الجانبية -->
+<div class="sidebar">
+    <button class="side-btn" onclick="loadMsg(1)">1</button>
+    <button class="side-btn" onclick="loadMsg(2)">2</button>
+    <button class="side-btn" onclick="loadMsg(3)">3</button>
+    <button class="side-btn" onclick="loadMsg(4)">4</button>
+    <button class="side-btn" onclick="loadMsg(5)">5</button>
 </div>
 
-<!-- مزاج اليوم -->
-<div class="section">
-    <h2>كيف حالك اليوم ؟</h2>
+<!-- المحتوى -->
+<div class="container">
+    <h2>For My Boo 💗</h2>
 
-    <div id="moodResult" style="font-size:25px;margin-bottom:10px;"></div>
-
-    <div class="emoji-choice" id="emojiChoices">
-        <span onclick="pickMood('😭')">😭</span>
-        <span onclick="pickMood('❤️')">❤️</span>
-        <span onclick="pickMood('🤐')">🤐</span>
-    </div>
+    <div class="chat-box" id="chatBox"></div>
 </div>
-
-<!-- رسالة اليوم -->
-<div class="section">
-    <h2>رسالة اليوم 💌</h2>
-    <div id="dailyMessage"></div>
-</div>
-
-<!-- لغز اليوم -->
-<div class="section">
-    <h2>لغز اليوم 🧩</h2>
-    <div id="puzzleQuestion"></div>
-    <input id="puzzleAnswer" placeholder="اكتبي الإجابة هنا">
-    <button onclick="checkPuzzle()">تحقّق</button>
-    <div id="puzzleResult" style="margin-top:10px;font-weight:bold;"></div>
-</div>
-
-<!-- الدردشة -->
-<div class="section">
-    <h2>الدردشة 💬</h2>
-
-    <div id="chatBox"
-         style="height:250px; overflow-y:auto; border:1px solid #ff8dc6; padding:10px; border-radius:10px; background:#fff;">
-    </div>
-
-    <input id="chatInput" placeholder="اكتبي رسالة...">
-    <button onclick="sendMessage()">إرسال</button>
-</div>
-
-
-
 
 <script>
+let messages = [
+`علابالك شوا كندير درك ؟ نخمم فيك💭💗
+لوكان جيت قطة تڤولي pspsps 🙄😔
+نتا أجمل حاجة صراتلي 🫶🏻❤️
+عجبتك l'app هادي؟ درتها باش نفرحك 🩷
+نحبك مام منڤولهاش كل نهار 😭💗`,
 
-/* Firebase Config */
-const firebaseConfig = {
-  apiKey: "AAAAA",
-  authDomain: "AAAAA.firebaseapp.com",
-  projectId: "AAAAA",
-  storageBucket: "AAAAA.appspot.com",
-  messagingSenderId: "AAAAA",
-  appId: "AAAAA"
-};
+`Bcc coucou saha 3idkom 😂😂
+معلاباليش لماه كتبتها 
+نهار دي عرفتك فيه منسيتوش يبان كان لبارح 😩`,
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+`شوا ڤاعد دير؟ توحشتيني 🙄
+لوكان نتخاصمو تسوبريمي for my boo ولا تخليها 🤧
+اول مرة ندير app فحياتي ودرتها على جالك 😔💗`,
 
-/* الرسائل اليومية */
-const messages = [
-"علابالك شوا كندير درك ؟ نخمم فيك💭💗",
-"لوكان جيت قطة تڤولي pspsps 🙄😔",
-"نتا أجمل حاجة صراتلي 🫶🏻❤️",
-"عجبتك l\"app هادي؟ درتها باش نفرحك 🩷",
-"نحبك مام منڤولهاش كل نهار 😭💗",
-"Bcc coucou saha 3idkom 😂😂",
-"نهار دي عرفتك فيه منسيتوش يبان كان لبارح 😩",
-"شوا ڤاعد دير؟ توحشتيني 🙄",
-"لوكان نتخاصمو تسوبريمي for my boo ولا تخليها 🤧",
-"اول مرة ندير app فحياتي ودرتها على جالك 😔💗",
-"Ily !🩷",
-"تعجبك كلمة best friend ؟ نتا best friend تاعي 🐣",
-"كوتي كوتي يا خلاصو 👶🏻",
-"ملڤيتش شوا نڤولك ليوم 😬",
-"لوكان جيت فراشة تصيدني؟ 😑",
-"ڤداه عمرنا ليوم ؟ جاوب فلنسطا 🙄",
-"كي تغمض عينيك و تتخيل المستقبل… تشوفني معاك؟"
+`Ily !🩷 موالفة نبعتهالك ومفهمتيهاش 
+اختصار تاع i love you 😬🖖🏻
+تعجبك كلمة best friend ؟علابالي متعجبكش 
+نتا best friend تاعي 🐣 
+كوتي كوتي يا خلاصو 👶🏻`,
+
+`ملڤيتش شوا نڤولك ليوم 😬
+لوكان جيت فراشة تصيدني؟ 😑 
+اذا ڤولتي تصيدني يعني متحبليش لخير وحاب نموت 
+واذا ڤولتي متصيدنيش يعني نتا مسامعش بيا 
+ڤداه عمرنا ليوم ؟
+جاوب فلنسطا 🙄
+كي تغمض عينيك وتيماجيني روحك ف 2046 تشوفني معاك؟`
 ];
 
-function loadDailyMessage() {
-    let lastTime = localStorage.getItem("msgTime");
-    let msgIndex = localStorage.getItem("msgIndex");
+function loadMsg(num) {
+    let chat = document.getElementById("chatBox");
+    chat.innerHTML = "";
+    let parts = messages[num - 1].split("\n");
 
-    let now = Date.now();
-
-    if (!lastTime || now - lastTime >= 86400000) {
-        msgIndex = Math.floor(Math.random() * messages.length);
-        localStorage.setItem("msgIndex", msgIndex);
-        localStorage.setItem("msgTime", now);
-    }
-
-    document.getElementById("dailyMessage").innerHTML =
-        messages[msgIndex];
-}
-loadDailyMessage();
-
-/* مزاج اليوم */
-function pickMood(emoji) {
-    db.collection("appData").doc("mood").set({
-        mood: emoji,
-        time: Date.now()
+    parts.forEach(t => {
+        let div = document.createElement("div");
+        div.className = "message";
+        div.innerText = t;
+        chat.appendChild(div);
     });
-
-    document.getElementById("moodResult").innerHTML = "مزاجك: " + emoji;
-    document.getElementById("emojiChoices").style.display = "none";
 }
-
-db.collection("appData").doc("mood")
-.onSnapshot((doc) => {
-    if (doc.exists) {
-        let data = doc.data();
-        document.getElementById("moodResult").innerHTML =
-            "مزاج اليوم: " + data.mood;
-        document.getElementById("emojiChoices").style.display = "none";
-    }
-});
-
-/* العداد */
-let savedStart = localStorage.getItem("customStartDate");
-let startDate = savedStart ? new Date(savedStart) : new Date();
-
-function updateCounter() {
-    let now = new Date();
-
-    let years  = now.getFullYear() - startDate.getFullYear();
-    let months = now.getMonth()    - startDate.getMonth();
-    let days   = now.getDate()     - startDate.getDate();
-
-    if (days < 0) { months--; days += 30; }
-    if (months < 0) { years--; months += 12; }
-
-    document.getElementById("counter").innerHTML =
-        years + " سنة • " + months + " شهر • " + days + " يوم";
-}
-setInterval(updateCounter, 1000);
-updateCounter();
-
-function setCustomStartDate() {
-    let y = +document.getElementById("yearsInput").value || 0;
-    let m = +document.getElementById("monthsInput").value || 0;
-    let d = +document.getElementById("daysInput").value || 0;
-
-    let now = new Date();
-    let customStart = new Date(now);
-    customStart.setFullYear(now.getFullYear() - y);
-    customStart.setMonth(now.getMonth() - m);
-    customStart.setDate(now.getDate() - d);
-
-    localStorage.setItem("customStartDate", customStart.toISOString());
-    startDate = customStart;
-    alert("تم تحديث العداد ❤️");
-}
-
-/* لغز اليوم */
-const puzzles = [
-    { q: "يمشي بلا قدمين؟", a: "الوقت" },
-    { q: "شيء إذا أخذت منه كبر؟", a: "الحفرة" },
-    { q: "يرى وليس له عيون؟", a: "المرآة" }
-];
-
-let puzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
-document.getElementById("puzzleQuestion").innerHTML = puzzle.q;
-
-function checkPuzzle() {
-    let ans = document.getElementById("puzzleAnswer").value.trim();
-    document.getElementById("puzzleResult").innerHTML =
-        ans === puzzle.a ? "صحيح ❤️👏" : "غلط 😢";
-}
-
-/* بوت داخل الشات */
-function botReply(userMsg) {
-    userMsg = userMsg.toLowerCase();
-
-    if (userMsg.includes("boo")) return "نعم حبي؟ 💗";
-    if (userMsg.includes("love")) return "I love you too 😭❤️";
-    if (userMsg.includes("miss")) return "حتى أنا توحشتك بزاف 😔🩷";
-    if (userMsg.includes("hey")) return "Heyy baby 💗✨";
-
-    return null;
-}
-
-/* الشات الحقيقي */
-function sendMessage() {
-    let msg = document.getElementById("chatInput").value.trim();
-    if (msg === "") return;
-
-    // رسالة المستخدم
-    db.collection("chat").add({
-        text: msg,
-        time: Date.now()
-    });
-
-    document.getElementById("chatInput").value = "";
-
-    // ردّ البوت
-    let reply = botReply(msg);
-    if (reply) {
-        db.collection("chat").add({
-            text: "Bot: " + reply,
-            time: Date.now() + 1
-        });
-    }
-}
-
-db.collection("chat")
-  .orderBy("time")
-  .onSnapshot(snapshot => {
-      let chatBox = document.getElementById("chatBox");
-      chatBox.innerHTML = "";
-
-      snapshot.forEach(doc => {
-          let data = doc.data();
-          let div = document.createElement("div");
-          div.className = "bubble";
-          div.innerHTML = data.text;
-          chatBox.appendChild(div);
-      });
-
-      chatBox.scrollTop = chatBox.scrollHeight;
-  });
-
 </script>
 
 </body>
