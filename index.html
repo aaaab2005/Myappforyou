@@ -4,14 +4,23 @@
 <meta charset="UTF-8" />
 <title>For My Boo</title>
 
+<!-- 🔥 Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
 <style>
-    body {
-        background: #ffd6e8;
-        font-family: "Tahoma";
-        text-align: center;
-        padding: 20px;
-        color: #b3005c;
-    }
+
+html {
+    zoom: 1.25;
+}
+
+body {
+    background: #ffd6e8;
+    font-family: "Tahoma";
+    text-align: center;
+    padding: 20px;
+    color: #b3005c;
+}
 
     h1 { font-size: 36px; }
 
@@ -29,7 +38,7 @@
         margin-top: 10px;
     }
 
-    input, button, textarea {
+    input, button {
         width: 90%;
         padding: 12px;
         border-radius: 10px;
@@ -48,6 +57,17 @@
         font-size: 40px;
         margin: 10px;
         cursor: pointer;
+    }
+
+    /* فقاعات الشات */
+    .bubble {
+        margin: 8px 0;
+        padding: 10px;
+        border-radius: 12px;
+        background: #ffe0ef;
+        text-align: right;
+        width: fit-content;
+        max-width: 80%;
     }
 </style>
 </head>
@@ -83,39 +103,84 @@
 <!-- ░░░ الرسالة اليومية ░░░ -->
 <div class="section">
     <h2>رسالة اليوم 💌</h2>
-    <div id="dailyMessage" style="font-size:20px;line-height:1.6;"></div>
+    <div id="dailyMessage"></div>
 </div>
 
 <!-- ░░░ لعبة الألغاز ░░░ -->
 <div class="section">
     <h2>لغز اليوم 🧩</h2>
-    <div id="puzzleQuestion" style="font-size:20px;margin-bottom:10px;"></div>
+    <div id="puzzleQuestion"></div>
     <input id="puzzleAnswer" placeholder="اكتبي الإجابة هنا">
     <button onclick="checkPuzzle()">تحقّق</button>
     <div id="puzzleResult" style="margin-top:10px;font-weight:bold;"></div>
 </div>
 
+<!-- ░░░ قسم الشات ░░░ -->
+<div class="section">
+    <h2>الدردشة 💬</h2>
+
+    <div id="chatBox"
+         style="height:250px; overflow-y:auto; border:1px solid #ff8dc6; padding:10px; border-radius:10px; background:#fff;">
+    </div>
+
+    <input id="chatInput" placeholder="اكتبي رسالة...">
+    <button onclick="sendMessage()">إرسال</button>
+</div>
+
 <script>
-/* ================================
-   1) الرسائل اليومية — 24 ساعة
-================================ */
+
+/* --------------------------------------------------
+   🔥 1) Firebase Config — بدّلي القيم بمعلوماتك
+-------------------------------------------------- */
+const firebaseConfig = {
+  apiKey: "AAAAA",
+  authDomain: "AAAAA.firebaseapp.com",
+  projectId: "AAAAA",
+  storageBucket: "AAAAA.appspot.com",
+  messagingSenderId: "AAAAA",
+  appId: "AAAAA"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+
+/* --------------------------------------------------
+   2) الرسائل اليومية (محلي)
+-------------------------------------------------- */
 const messages = [
 "علابالك شوا كندير درك ؟ نخمم فيك💭💗",
+
 "لوكان جيت قطة تڤولي pspsps 🙄😔",
+
 "نتا أجمل حاجة صراتلي 🫶🏻❤️",
-"عجبتك l'app هادي؟ درتها باش نفرحك 🩷",
+
+"عجبتك l\"app هادي؟ درتها باش نفرحك 🩷",
+
 "نحبك مام منڤولهاش كل نهار 😭💗",
-"Bcc coucou saha 3idkom 😂😂",
+
+"Bcc coucou saha 3idkom 😂😂 (معلاباليش لماه كتبتها)",
+
 "نهار دي عرفتك فيه منسيتوش يبان كان لبارح 😩",
+
 "شوا ڤاعد دير؟ توحشتيني 🙄",
+
 "لوكان نتخاصمو تسوبريمي for my boo ولا تخليها 🤧",
+
 "اول مرة ندير app فحياتي ودرتها على جالك 😔💗",
-"Ily !🩷 اختصار تاع I love you 😬🖖🏻",
-"تعجبك كلمة best friend ؟ نتا best friend تاعي 🐣",
+
+"Ily !🩷 موالفة نبعتهالك ومفهمتيهاش — اختصار تاع I love you 😬🖖🏻",
+
+"تعجبك كلمة best friend ؟ علابالي متعجبكش… نتا best friend تاعي 🐣",
+
 "كوتي كوتي يا خلاصو 👶🏻",
+
 "ملڤيتش شوا نڤولك ليوم 😬",
-"لوكان جيت فراشة تصيدني؟ 😑",
-"ڤداه عمرنا ليوم ؟ 🙄",
+
+"لوكان جيت فراشة تصيدني؟ 😑 (اذا ڤولتي تصيدني يعني متحبليش لخير… واذا ڤولتي متصيدنيش يعني نتا مسامعش بيا)",
+
+"ڤداه عمرنا ليوم ؟ جاوب فلنسطا 🙄",
+
 "كي تغمض عينيك وتيماجيني روحك ف 2046 تشوفني معاك؟"
 ];
 
@@ -125,42 +190,46 @@ function loadDailyMessage() {
 
     let now = Date.now();
 
-    if (!lastTime || now - lastTime >= 24 * 60 * 60 * 1000) {
+    if (!lastTime || now - lastTime >= 86400000) {
         msgIndex = Math.floor(Math.random() * messages.length);
         localStorage.setItem("msgIndex", msgIndex);
         localStorage.setItem("msgTime", now);
     }
 
-    document.getElementById("dailyMessage").innerHTML = messages[msgIndex];
+    document.getElementById("dailyMessage").innerHTML =
+        messages[msgIndex];
 }
 loadDailyMessage();
 
-/* ================================
-   2) سؤال الإيموجي — 24 ساعة
-================================ */
-function loadMood() {
-    let lastMoodTime = localStorage.getItem("moodTime");
-    let savedMood    = localStorage.getItem("mood");
 
-    let now = Date.now();
-
-    if (savedMood && lastMoodTime && now - lastMoodTime < 24 * 60 * 60 * 1000) {
-        document.getElementById("moodResult").innerHTML = "مزاجك: " + savedMood;
-        document.getElementById("emojiChoices").style.display = "none";
-    }
-}
-loadMood();
+/* --------------------------------------------------
+   3) مزاج اليوم — مــتزامن 🔥
+-------------------------------------------------- */
 
 function pickMood(emoji) {
-    localStorage.setItem("mood", emoji);
-    localStorage.setItem("moodTime", Date.now());
+    db.collection("appData").doc("mood").set({
+        mood: emoji,
+        time: Date.now()
+    });
+
     document.getElementById("moodResult").innerHTML = "مزاجك: " + emoji;
     document.getElementById("emojiChoices").style.display = "none";
 }
 
-/* ================================
-   3) العداد + التعديل اليدوي
-================================ */
+db.collection("appData").doc("mood")
+.onSnapshot((doc) => {
+    if (doc.exists) {
+        let data = doc.data();
+        document.getElementById("moodResult").innerHTML =
+            "مزاج اليوم: " + data.mood;
+        document.getElementById("emojiChoices").style.display = "none";
+    }
+});
+
+
+/* --------------------------------------------------
+   4) العداد — محلي
+-------------------------------------------------- */
 let savedStart = localStorage.getItem("customStartDate");
 let startDate = savedStart ? new Date(savedStart) : new Date();
 
@@ -171,14 +240,8 @@ function updateCounter() {
     let months = now.getMonth()    - startDate.getMonth();
     let days   = now.getDate()     - startDate.getDate();
 
-    if (days < 0) {
-        months--;
-        days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-    }
-    if (months < 0) {
-        years--;
-        months += 12;
-    }
+    if (days < 0) { months--; days += 30; }
+    if (months < 0) { years--; months += 12; }
 
     document.getElementById("counter").innerHTML =
         years + " سنة • " + months + " شهر • " + days + " يوم";
@@ -187,32 +250,29 @@ setInterval(updateCounter, 1000);
 updateCounter();
 
 function setCustomStartDate() {
-    let y = parseInt(document.getElementById("yearsInput").value) || 0;
-    let m = parseInt(document.getElementById("monthsInput").value) || 0;
-    let d = parseInt(document.getElementById("daysInput").value) || 0;
+    let y = +document.getElementById("yearsInput").value || 0;
+    let m = +document.getElementById("monthsInput").value || 0;
+    let d = +document.getElementById("daysInput").value || 0;
 
     let now = new Date();
     let customStart = new Date(now);
-
-    customStart.setFullYear(customStart.getFullYear() - y);
-    customStart.setMonth(customStart.getMonth() - m);
-    customStart.setDate(customStart.getDate() - d);
+    customStart.setFullYear(now.getFullYear() - y);
+    customStart.setMonth(now.getMonth() - m);
+    customStart.setDate(now.getDate() - d);
 
     localStorage.setItem("customStartDate", customStart.toISOString());
     startDate = customStart;
-    updateCounter();
     alert("تم تحديث العداد ❤️");
 }
 
-/* ================================
-   4) لعبة الألغاز
-================================ */
+
+/* --------------------------------------------------
+   5) الألغاز — محلي
+-------------------------------------------------- */
 const puzzles = [
-    { q: "شيء يمشي بلا قدمين؟", a: "الوقت" },
-    { q: "ما هو الشيء الذي إذا أخذت منه كبر؟", a: "الحفرة" },
-    { q: "شيء يرى كل شيء وليس له عيون؟", a: "المرآة" },
-    { q: "شيء له أسنان ولا يعض؟", a: "المشط" },
-    { q: "يمشي ويقف وليس له أرجل؟", a: "الساعة" }
+    { q: "يمشي بلا قدمين؟", a: "الوقت" },
+    { q: "شيء إذا أخذت منه كبر؟", a: "الحفرة" },
+    { q: "يرى وليس له عيون؟", a: "المرآة" }
 ];
 
 let puzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
@@ -220,14 +280,47 @@ document.getElementById("puzzleQuestion").innerHTML = puzzle.q;
 
 function checkPuzzle() {
     let ans = document.getElementById("puzzleAnswer").value.trim();
-    if (ans === "") return;
-
     if (ans === puzzle.a) {
         document.getElementById("puzzleResult").innerHTML = "صحيح ❤️👏";
     } else {
         document.getElementById("puzzleResult").innerHTML = "غلط 😢";
     }
 }
+
+
+/* --------------------------------------------------
+   6) الشــــات 🔥 Real-Time Chat
+-------------------------------------------------- */
+
+function sendMessage() {
+    let msg = document.getElementById("chatInput").value.trim();
+    if (msg === "") return;
+
+    db.collection("chat").add({
+        text: msg,
+        time: Date.now()
+    });
+
+    document.getElementById("chatInput").value = "";
+}
+
+db.collection("chat")
+  .orderBy("time")
+  .onSnapshot(snapshot => {
+      let chatBox = document.getElementById("chatBox");
+      chatBox.innerHTML = "";
+
+      snapshot.forEach(doc => {
+          let data = doc.data();
+          let div = document.createElement("div");
+          div.className = "bubble";
+          div.innerHTML = data.text;
+          chatBox.appendChild(div);
+      });
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+  });
+
 </script>
 
 </body>
