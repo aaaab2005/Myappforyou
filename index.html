@@ -4,137 +4,293 @@
 <meta charset="UTF-8" />
 <title>For My Boo</title>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
 <style>
-    body {
-        margin: 0;
-        font-family: Arial;
-        background: #f5f5f5;
-        overflow: hidden;
-    }
+body {
+    background: #ffd6e8;
+    font-family: "Tahoma";
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    color: #b3005c;
+}
 
-    /* القائمة الجانبية */
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 70px;
-        height: 100vh;
-        background: #ff7aa2;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 20px;
-        gap: 20px;
-        box-shadow: 3px 0 8px rgba(0,0,0,0.2);
-    }
+/* =================== القائمة الجانبية =================== */
+#menu {
+    width: 250px;
+    height: 100%;
+    background: white;
+    position: fixed;
+    top: 0;
+    left: -260px;
+    transition: 0.4s;
+    box-shadow: 0 0 10px #ff9ec9;
+    padding: 20px;
+    z-index: 999;
+}
+#menu h2 { text-align: center; }
 
-    .side-btn {
-        width: 55px;
-        height: 55px;
-        background: white;
-        border-radius: 15px;
-        font-size: 22px;
-        font-weight: bold;
-        border: none;
-        cursor: pointer;
-    }
+.menu-item {
+    padding: 15px;
+    margin-top: 10px;
+    background: #ffe4f2;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+}
 
-    /* المحتوى */
-    .container {
-        margin-left: 80px;
-        padding: 20px;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
+/* زر فتح القائمة */
+#openMenu {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 30px;
+    cursor: pointer;
+}
 
-    h2 {
-        margin-top: 0;
-        color: #ff2f77;
-    }
+/* المحتوى */
+.page {
+    padding: 30px;
+    display: none;
+}
 
-    /* الرسائل */
-    .chat-box {
-        flex: 1;
-        background: white;
-        border-radius: 15px;
-        padding: 15px;
-        overflow-y: auto;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
+.active { display: block; }
 
-    .message {
-        background: #ffe3ee;
-        padding: 10px 15px;
-        border-radius: 12px;
-        margin-bottom: 10px;
-        width: fit-content;
-        max-width: 80%;
-    }
+/* حاوية الشات */
+#chatBox {
+    height: 250px;
+    overflow-y: auto;
+    border: 1px solid #ff8dc6;
+    padding: 10px;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.bubble {
+    background: #ffe0ef;
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 10px;
+    width: fit-content;
+}
+
+button {
+    background: #ff5fa2;
+    border: none;
+    color: white;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+input {
+    width: 90%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-top: 10px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- القائمة الجانبية -->
-<div class="sidebar">
-    <button class="side-btn" onclick="loadMsg(1)">1</button>
-    <button class="side-btn" onclick="loadMsg(2)">2</button>
-    <button class="side-btn" onclick="loadMsg(3)">3</button>
-    <button class="side-btn" onclick="loadMsg(4)">4</button>
-    <button class="side-btn" onclick="loadMsg(5)">5</button>
+<div id="openMenu">☰</div>
+
+<!-- =================== القائمة الجانبية =================== -->
+<div id="menu">
+    <h2>القائمة</h2>
+
+    <div class="menu-item" onclick="showPage('home')">🏠 الرئيسية</div>
+    <div class="menu-item" onclick="showPage('counter')">❤️ عداد الحب</div>
+    <div class="menu-item" onclick="showPage('mood')">😊 كيف حالك؟</div>
+    <div class="menu-item" onclick="showPage('chat')">💬 الدردشة</div>
 </div>
 
-<!-- المحتوى -->
-<div class="container">
-    <h2>For My Boo 💗</h2>
+<!-- =================== الصفحات =================== -->
 
-    <div class="chat-box" id="chatBox"></div>
+<!-- الرئيسية -->
+<div id="home" class="page active">
+    <h1>For My Boo 💗</h1>
+    <h2>رسالة اليوم 💌</h2>
+    <div id="dailyMessage" style="font-size:23px;"></div>
+</div>
+
+<!-- العداد -->
+<div id="counter" class="page">
+    <h2>عداد الحب ❤️</h2>
+    <div id="loveCounter" style="font-size:25px;font-weight:bold;"></div>
+
+    <h3>تحديث يدوي:</h3>
+    <input id="years" type="number" placeholder="سنوات">
+    <input id="months" type="number" placeholder="أشهر">
+    <input id="days" type="number" placeholder="أيام">
+    <button onclick="updateLoveCounter()">تحديث</button>
+</div>
+
+<!-- المزاج -->
+<div id="mood" class="page">
+    <h2>كيف حالك اليوم ؟</h2>
+    <div id="moodResult" style="font-size:25px;margin-bottom:10px;"></div>
+
+    <span style="font-size:40px;cursor:pointer" onclick="setMood('😭')">😭</span>
+    <span style="font-size:40px;cursor:pointer" onclick="setMood('❤️')">❤️</span>
+    <span style="font-size:40px;cursor:pointer" onclick="setMood('😐')">😐</span>
+</div>
+
+<!-- الدردشة -->
+<div id="chat" class="page">
+    <h2>الدردشة 💬</h2>
+
+    <div id="chatBox"></div>
+
+    <input id="chatInput" placeholder="اكتبي رسالة...">
+    <button onclick="sendMessage()">إرسال</button>
 </div>
 
 <script>
-let messages = [
-`علابالك شوا كندير درك ؟ نخمم فيك💭💗
-لوكان جيت قطة تڤولي pspsps 🙄😔
-نتا أجمل حاجة صراتلي 🫶🏻❤️
-عجبتك l'app هادي؟ درتها باش نفرحك 🩷
-نحبك مام منڤولهاش كل نهار 😭💗`,
 
-`Bcc coucou saha 3idkom 😂😂
-معلاباليش لماه كتبتها 
-نهار دي عرفتك فيه منسيتوش يبان كان لبارح 😩`,
+/* ============ Firebase Config ============ */
+const firebaseConfig = YOUR_FIREBASE_CONFIG_HERE;
 
-`شوا ڤاعد دير؟ توحشتيني 🙄
-لوكان نتخاصمو تسوبريمي for my boo ولا تخليها 🤧
-اول مرة ندير app فحياتي ودرتها على جالك 😔💗`,
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-`Ily !🩷 موالفة نبعتهالك ومفهمتيهاش 
-اختصار تاع i love you 😬🖖🏻
-تعجبك كلمة best friend ؟علابالي متعجبكش 
-نتا best friend تاعي 🐣 
-كوتي كوتي يا خلاصو 👶🏻`,
+/* ============ القائمة الجانبية ============ */
+document.getElementById("openMenu").onclick = () => {
+    document.getElementById("menu").style.left = "0";
+};
 
-`ملڤيتش شوا نڤولك ليوم 😬
-لوكان جيت فراشة تصيدني؟ 😑 
-اذا ڤولتي تصيدني يعني متحبليش لخير وحاب نموت 
-واذا ڤولتي متصيدنيش يعني نتا مسامعش بيا 
-ڤداه عمرنا ليوم ؟
-جاوب فلنسطا 🙄
-كي تغمض عينيك وتيماجيني روحك ف 2046 تشوفني معاك؟`
+document.body.onclick = (e) => {
+    if (e.target.id !== "menu" && e.target.id !== "openMenu") {
+        document.getElementById("menu").style.left = "-260px";
+    }
+};
+
+/* ============ تغيير الصفحات ============ */
+function showPage(id) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+/* ============ رسالة اليوم ============ */
+const messages = [
+"علابالك شوا كندير درك ؟ نخمم فيك💭💗",
+"لوكان جيت قطة تڤولي pspsps 🙄😔",
+"نتا أجمل حاجة صراتلي 🫶🏻❤️",
+"عجبتك l\"app هادي؟ درتها باش نفرحك 🩷",
+"نحبك مام منڤولهاش كل نهار 😭💗",
+"Bcc coucou saha 3idkom 😂😂 معلاباليش لماه كتبتها",
+"نهار دي عرفتك فيه منسيتوش يبان كان لبارح 😩",
+"شوا ڤاعد دير؟ توحشتيني 🙄",
+"لوكان نتخاصمو تسوبريمي for my boo ولا تخليها 🤧",
+"اول مرة ندير app فحياتي ودرتها على جالك 😔💗",
+"Ily !🩷 اختصار I love you 😬🖖🏻",
+"تعجبك كلمة best friend ؟ نتا best friend تاعي 🐣",
+"كوتي كوتي يا خلاصو 👶🏻",
+"ملڤيتش شوا نڤولك ليوم 😬",
+"لوكان جيت فراشة تصيدني؟ 😑",
+"ڤداه عمرنا ليوم ؟ جاوب فلنسطا 🙄",
+"كي تغمض عينيك وتيماجيني روحك ف 2046 تشوفني معاك؟"
 ];
 
-function loadMsg(num) {
-    let chat = document.getElementById("chatBox");
-    chat.innerHTML = "";
-    let parts = messages[num - 1].split("\n");
+function loadDailyMessage() {
+    db.ref("daily").once("value", snap => {
+        let data = snap.val();
 
-    parts.forEach(t => {
-        let div = document.createElement("div");
-        div.className = "message";
-        div.innerText = t;
-        chat.appendChild(div);
+        let now = Date.now();
+        let last = data?.time || 0;
+
+        if (now - last >= 86400000) {
+            let msg = messages[Math.floor(Math.random() * messages.length)];
+            db.ref("daily").set({ text: msg, time: now });
+            document.getElementById("dailyMessage").innerHTML = msg;
+        } else {
+            document.getElementById("dailyMessage").innerHTML = data.text;
+        }
     });
 }
+loadDailyMessage();
+
+/* ============ عداد الحب ============ */
+db.ref("loveCounter").on("value", snap => {
+    let data = snap.val();
+    if (!data) return;
+
+    let startDate = new Date(data.start);
+    let now = new Date();
+
+    let years  = now.getFullYear() - startDate.getFullYear();
+    let months = now.getMonth() - startDate.getMonth();
+    let days   = now.getDate() - startDate.getDate();
+
+    if (days < 0) { months--; days += 30; }
+    if (months < 0) { years--; months += 12; }
+
+    document.getElementById("loveCounter").innerHTML =
+        `${years} سنة • ${months} شهر • ${days} يوم`;
+});
+
+function updateLoveCounter() {
+    let y = +document.getElementById("years").value || 0;
+    let m = +document.getElementById("months").value || 0;
+    let d = +document.getElementById("days").value || 0;
+
+    let now = new Date();
+    let custom = new Date(now);
+    custom.setFullYear(now.getFullYear() - y);
+    custom.setMonth(now.getMonth() - m);
+    custom.setDate(now.getDate() - d);
+
+    db.ref("loveCounter").set({
+        start: custom.toISOString()
+    });
+
+    alert("تم التحديث ❤️");
+}
+
+/* ============ مزاج اليوم ============ */
+function setMood(mood) {
+    db.ref("mood").set({
+        emoji: mood,
+        time: Date.now()
+    });
+}
+
+db.ref("mood").on("value", snap => {
+    let data = snap.val();
+    if (data) {
+        document.getElementById("moodResult").innerHTML =
+            `مزاج اليوم: ${data.emoji}`;
+    }
+});
+
+/* ============ الشات ============ */
+function sendMessage() {
+    let msg = document.getElementById("chatInput").value.trim();
+    if (!msg) return;
+
+    db.ref("chat").push({
+        text: msg,
+        time: Date.now()
+    });
+
+    document.getElementById("chatInput").value = "";
+}
+
+db.ref("chat").on("child_added", snap => {
+    let data = snap.val();
+    let div = document.createElement("div");
+    div.className = "bubble";
+    div.innerHTML = data.text;
+    document.getElementById("chatBox").appendChild(div);
+
+    let box = document.getElementById("chatBox");
+    box.scrollTop = box.scrollHeight;
+});
 </script>
 
 </body>
