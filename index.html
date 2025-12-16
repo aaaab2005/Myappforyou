@@ -1,75 +1,150 @@
-// ❤️ تاريخ البداية
-const startDate = new Date(2023, 5, 28); // جوان = 5
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Love App ❤️</title>
 
-// ❤️ Love Counter (سنوات + شهور + أيام)
-function updateCounter() {
-  const today = new Date();
+  <style>
+    body {
+      background: #ffe6ee;
+      font-family: Arial, sans-serif;
+      direction: rtl;
+    }
 
-  let years = today.getFullYear() - startDate.getFullYear();
-  let months = today.getMonth() - startDate.getMonth();
-  let days = today.getDate() - startDate.getDate();
+    .app {
+      background: white;
+      width: 340px;
+      margin: 80px auto;
+      padding: 25px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
 
-  if (days < 0) {
-    months--;
-    const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-    days += prevMonth.getDate();
-  }
+    h1 {
+      color: #ff4d6d;
+    }
 
-  if (months < 0) {
-    years--;
-    months += 12;
-  }
+    #counter {
+      margin: 15px 0;
+      font-size: 16px;
+      color: #444;
+    }
 
-  document.getElementById("counter").textContent =
-    `❤️ ${years} سنة، ${months} شهر، ${days} يوم ❤️`;
-}
+    button {
+      margin-top: 15px;
+      padding: 12px 18px;
+      border: none;
+      background: #ff4d6d;
+      color: white;
+      border-radius: 12px;
+      font-size: 15px;
+      cursor: pointer;
+    }
 
-updateCounter();
+    button:hover {
+      background: #e63e5c;
+    }
 
-// 💌 الرسائل (كما عطيتِهم)
-const messages = [
-  "علابالك شوا كندير درك ؟ نخمم فيك💭💗",
-  "لوكان جيت قطة تڤولي pspsps 🙄😔",
-  "نتا أجمل حاجة صراتلي 🫶🏻❤️",
-  "عجبتك l'app هادي؟ درتها باش نفرحك 🩷",
-  "نحبك مام منڤولهاش كل نهار 😭💗",
-  "Bcc coucou saha 3idkom 😂😂\nمعلاباليش لماه كتبتها",
-  "نهار دي عرفتك فيه منسيتوش يبان كان لبارح 😩",
-  "شوا ڤاعد دير؟ توحشتيني 🙄",
-  "لوكان نتخاصمو تسوبريمي for my boo ولا تخليها 🤧",
-  "اول مرة ندير app فحياتي ودرتها على جالك 😔💗",
-  "Ily !🩷 موالفة نبعتهالك ومفهمتيهاش\nاختصار تاع i love you 😬🖖🏻",
-  "تعجبك كلمة best friend ؟ علابالي متعجبكش\nنتا best friend تاعي 🐣",
-  "كوتي كوتي يا خلاصو 👶🏻",
-  "ملڤيتش شوا نڤولك ليوم 😬",
-  "لوكان جيت فراشة تصيدني؟ 😑\nاذا ڤولتي تصيدني يعني متحبليش لخير وحاب نموت\nواذا ڤولتي متصيدنيش يعني نتا مسامعش بيا",
-  "ڤداه عمرنا ليوم ؟\nجاوب فلنسطا 🙄",
-  "كي تغمض عينيك وتيماجيني روحك ف 2046 تشوفني معاك؟"
-];
+    #messageBox {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff0f4;
+      border-radius: 12px;
+      color: #333;
+      font-size: 15px;
+      white-space: pre-line;
+    }
+  </style>
+</head>
 
-// 🧮 حساب عدد الأيام من البداية
-function daysSinceStart() {
-  const today = new Date();
-  const diff = today - startDate;
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
-}
+<body>
 
-// 💌 إظهار رسالة اليوم فقط
-function showMessage() {
-  const todayKey = new Date().toDateString();
-  const savedDate = localStorage.getItem("messageDate");
+  <div class="app">
+    <h1>❤️ Love Counter ❤️</h1>
 
-  if (savedDate === todayKey) {
-    document.getElementById("messageBox").textContent =
-      "💗 رسالة اليوم قريتيها… ارجعي غدوا 💌";
-    return;
-  }
+    <p id="counter"></p>
 
-  const dayIndex = daysSinceStart();
-  const messageIndex = dayIndex % messages.length;
-  const message = messages[messageIndex];
+    <button onclick="showMessage()">رسالة اليوم 💌</button>
 
-  document.getElementById("messageBox").textContent = message;
-  localStorage.setItem("messageDate", todayKey);
-}
-    
+    <div id="messageBox"></div>
+  </div>
+
+  <script>
+    // ❤️ تاريخ البداية
+    const startDate = new Date(2023, 5, 28); // جوان = 5
+
+    // ⏳ حساب السنوات + الشهور + الأيام
+    function updateCounter() {
+      const today = new Date();
+
+      let years = today.getFullYear() - startDate.getFullYear();
+      let months = today.getMonth() - startDate.getMonth();
+      let days = today.getDate() - startDate.getDate();
+
+      if (days < 0) {
+        months--;
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+      }
+
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      document.getElementById("counter").textContent =
+        `مرّ ${years} سنة، ${months} شهر، ${days} يوم ❤️`;
+    }
+
+    updateCounter();
+
+    // 💌 الرسائل
+    const messages = [
+      "علابالك شوا كندير درك ؟ نخمم فيك💭💗",
+      "لوكان جيت قطة تڤولي pspsps 🙄😔",
+      "نتا أجمل حاجة صراتلي 🫶🏻❤️",
+      "عجبتك l'app هادي؟ درتها باش نفرحك 🩷",
+      "نحبك مام منڤولهاش كل نهار 😭💗",
+      "Bcc coucou saha 3idkom 😂😂\nمعلاباليش لماه كتبتها",
+      "نهار دي عرفتك فيه منسيتوش يبان كان لبارح 😩",
+      "شوا ڤاعد دير؟ توحشتيني 🙄",
+      "لوكان نتخاصمو تسوبريمي for my boo ولا تخليها 🤧",
+      "اول مرة ندير app فحياتي ودرتها على جالك 😔💗",
+      "Ily !🩷 موالفة نبعتهالك ومفهمتيهاش\nاختصار تاع i love you 😬🖖🏻",
+      "تعجبك كلمة best friend ؟ علابالي متعجبكش\nنتا best friend تاعي 🐣",
+      "كوتي كوتي يا خلاصو 👶🏻",
+      "ملڤيتش شوا نڤولك ليوم 😬",
+      "لوكان جيت فراشة تصيدني؟ 😑\nاذا ڤولتي تصيدني يعني متحبليش لخير وحاب نموت\nواذا ڤولتي متصيدنيش يعني نتا مسامعش بيا",
+      "ڤداه عمرنا ليوم ؟\nجاوب فلنسطا 🙄",
+      "كي تغمض عينيك وتيماجيني روحك ف 2046 تشوفني معاك؟"
+    ];
+
+    // 🧮 عدد الأيام من البداية
+    function daysSinceStart() {
+      const today = new Date();
+      const diff = today - startDate;
+      return Math.floor(diff / (1000 * 60 * 60 * 24));
+    }
+
+    // 💌 رسالة واحدة فقط في اليوم
+    function showMessage() {
+      const todayKey = new Date().toDateString();
+      const savedDate = localStorage.getItem("messageDate");
+
+      if (savedDate === todayKey) {
+        document.getElementById("messageBox").textContent =
+          "💗 رسالة اليوم قريتيها… ارجعي غدوا 💌";
+        return;
+      }
+
+      const index = daysSinceStart() % messages.length;
+      const message = messages[index];
+
+      document.getElementById("messageBox").textContent = message;
+      localStorage.setItem("messageDate", todayKey);
+    }
+  </script>
+
+</body>
+</html>
