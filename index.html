@@ -9,36 +9,41 @@
       background: #ffe6ee;
       font-family: Arial, sans-serif;
       direction: rtl;
+      font-size: 18px;
+      margin: 0;
+      padding: 0;
     }
 
     .app {
       background: white;
-      width: 340px;
-      margin: 80px auto;
+      width: 90%;
+      max-width: 450px;
+      margin: 60px auto;
       padding: 25px;
       border-radius: 20px;
       text-align: center;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
     }
 
     h1 {
       color: #ff4d6d;
+      margin-bottom: 15px;
     }
 
     #counter {
       margin: 15px 0;
-      font-size: 16px;
+      font-size: 18px;
       color: #444;
     }
 
     button {
       margin-top: 15px;
-      padding: 12px 18px;
+      padding: 14px 20px;
       border: none;
       background: #ff4d6d;
       color: white;
-      border-radius: 12px;
-      font-size: 15px;
+      border-radius: 14px;
+      font-size: 16px;
       cursor: pointer;
     }
 
@@ -47,13 +52,14 @@
     }
 
     #messageBox {
-      margin-top: 20px;
-      padding: 15px;
+      margin-top: 22px;
+      padding: 18px;
       background: #fff0f4;
-      border-radius: 12px;
+      border-radius: 14px;
       color: #333;
-      font-size: 15px;
+      font-size: 16px;
       white-space: pre-line;
+      min-height: 60px;
     }
   </style>
 </head>
@@ -134,7 +140,7 @@
 
       if (savedDate === todayKey) {
         document.getElementById("messageBox").textContent =
-          "💗 رسالة اليوم قريتيها… ارجع غدوا 💌";
+          "💗 رسالة اليوم قريتيها… رجع غدوة 💌";
         return;
       }
 
